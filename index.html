@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Panel Ejecutivo de Accesos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 100%);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 24px 12px;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 900px; /* Se expande de forma elegante en PC y mantiene diseño app en móvil */
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            padding: 24px 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-title h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #38bdf8;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #38bdf8;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.4; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Cuadrícula dinámica: 2 botones en celular pequeño, hasta 3 o 4 en pantallas grandes */
+        #button-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 por línea en celulares */
+            gap: 14px;
+        }
+
+        @media (min-width: 640px) {
+            #button-container {
+                grid-template-columns: repeat(3, 1fr); /* 3 por línea en tablets y PC */
+            }
+        }
+
+        /* Estilo de Tarjeta / Botón Ejecutivo con Color Dinámico */
+        .sheet-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 18px 16px;
+            text-decoration: none;
+            color: var(--text-main);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border-top: 4px solid var(--card-color, #3b82f6);
+        }
+
+        .sheet-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .sheet-card:active {
+            transform: scale(0.96);
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .card-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--card-color, #3b82f6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 10px var(--card-shadow, rgba(59, 130, 246, 0.3));
+        }
+
+        .card-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .external-icon {
+            width: 16px;
+            height: 16px;
+            fill: #94a3b8;
+            transition: transform 0.2s, fill 0.2s;
+        }
+
+        .sheet-card:hover .external-icon {
+            transform: translate(2px, -2px);
+            fill: var(--card-color, #3b82f6);
+        }
+
+        .card-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Máximo 2 líneas para mantener orden */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .state-message {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <header>
+            <div class="header-title">
+                <h1>Panel Ejecutivo</h1>
+            </div>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                <span id="status-text">Sincronizado</span>
+            </div>
+        </header>
+
+        <div id="button-container">
+            <div class="state-message">Cargando aplicaciones...</div>
+        </div>
+    </div>
+
+    <script>
+        // Tu URL exacta de Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxsQ-O8kkvh7harM4PlhWcP2eq462Mzc3zni4-WgtSmX5LOjrm8X_q7TnlWGzGjsiCtg/exec';
+
+        // Paleta de colores ejecutivos y divertidos para asignar a los botones dinámicamente
+        const colorPalette = [
+            { color: '#2563eb', shadow: 'rgba(37, 99, 235, 0.3)' }, // Azul
+            { color: '#059669', shadow: 'rgba(5, 150, 105, 0.3)' }, // Esmeralda
+            { color: '#7c3aed', shadow: 'rgba(124, 58, 237, 0.3)' }, // Púrpura
+            { color: '#d97706', shadow: 'rgba(217, 119, 6, 0.3)' },  // Ámbar
+            { color: '#0891b2', shadow: 'rgba(8, 145, 178, 0.3)' },  // Cian
+            { color: '#db2777', shadow: 'rgba(219, 39, 119, 0.3)' }, // Rosa/Fucsia
+            { color: '#4f46e5', shadow: 'rgba(79, 70, 229, 0.3)' },  // Índigo
+            { color: '#ea580c', shadow: 'rgba(234, 88, 12, 0.3)' }   // Naranja vibrante
+        ];
+
+        async function fetchSheetData() {
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const rows = await response.json();
+                renderUI(rows);
+            } catch (error) {
+                console.error('Error al conectar:', error);
+                document.getElementById('status-text').innerText = 'Sin conexión';
+                const container = document.getElementById('button-container');
+                container.innerHTML = `
+                    <div class="state-message" style="color: #f87171;">
+                        <b>Bloqueo CORS detectado.</b><br>Recuerda abrirlo mediante un servidor local o GitHub Pages.
+                    </div>
+                `;
+            }
+        }
+
+        function renderUI(rows) {
+            const container = document.getElementById('button-container');
+            
+            if (!rows || rows.length <= 1) {
+                container.innerHTML = `<div class="state-message">No hay registros a partir de la fila 2.</div>`;
+                return;
+            }
+
+            let html = '';
+            let colorIndex = 0;
+
+            // Recorremos desde la fila 2 (índice 1) en adelante
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const linkUrl = row[0] ? String(row[0]).trim() : ''; // Columna A (Enlace)
+                const titleName = row[1] ? String(row[1]).trim() : ''; // Columna B (Nombre)
+
+                // Validamos que la Columna A tenga un enlace web válido
+                if (linkUrl && (linkUrl.startsWith('http://') || linkUrl.startsWith('https://'))) {
+                    const displayTitle = titleName !== '' ? titleName : `Acceso #${i}`;
+                    
+                    // Seleccionamos un color cíclico de la paleta ejecutiva
+                    const currentTheme = colorPalette[colorIndex % colorPalette.length];
+                    colorIndex++;
+
+                    html += `
+                        <a href="${linkUrl}" target="_blank" rel="noopener noreferrer" class="sheet-card" style="--card-color: ${currentTheme.color}; --card-shadow: ${currentTheme.shadow};">
+                            <div class="card-top">
+                                <div class="card-icon">
+                                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                                </div>
+                                <svg class="external-icon" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                            </div>
+                            <div class="card-title">${displayTitle}</div>
+                        </a>
+                    `;
+                }
+            }
+
+            if (html === '') {
+                container.innerHTML = `<div class="state-message">No se encontraron enlaces válidos en la Columna A.</div>`;
+            } else {
+                container.innerHTML = html;
+            }
+        }
+
+        // Carga inicial y actualización automática cada 4 segundos
+        fetchSheetData();
+        setInterval(fetchSheetData, 4000);
+    </script>
+</body>
+</html>
