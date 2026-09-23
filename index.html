@@ -7,8 +7,38 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
     
-    <link rel="apple-touch-icon" href="https://i.imgur.com/TU_IMAGEN.png">
-    <link rel="icon" type="image/png" href="https://i.imgur.com/TU_IMAGEN.png">
+    <link rel="apple-touch-icon" href="https://i.imgur.com/TU_ENLACE_DE_IMAGEN_DIRECTO.png">
+    <link rel="icon" type="image/png" href="https://i.imgur.com/TU_ENLACE_DE_IMAGEN_DIRECTO.png">
+    
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Panel Ejecutivo">
+
+    <script>
+        const manifestData = {
+            "name": "Panel Ejecutivo de Accesos",
+            "short_name": "Panel",
+            "start_url": "./",
+            "display": "standalone",
+            "background_color": "#0f172a",
+            "theme_color": "#0f172a",
+            "icons": [
+                {
+                    "src": "https://i.imgur.com/TU_ENLACE_DE_IMAGEN_DIRECTO.png",
+                    "sizes": "512x512",
+                    "type": "image/png"
+                }
+            ]
+        };
+        const stringManifest = JSON.stringify(manifestData);
+        const blob = new Blob([stringManifest], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(blob);
+        const manifestTag = document.createElement('link');
+        manifestTag.rel = 'manifest';
+        manifestTag.href = manifestURL;
+        document.head.appendChild(manifestTag);
+    </script>
 
     <style>
         :root {
@@ -63,13 +93,37 @@
             letter-spacing: -0.3px;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Botón de instalación nativo flotante */
+        #install-btn {
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            color: #ffffff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: none; /* Se activa automáticamente si el navegador permite instalar */
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+            transition: transform 0.2s;
+        }
+
+        #install-btn:active {
+            transform: scale(0.95);
+        }
+
         .header-status-wrapper {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        /* Spinner de carga sutil */
         .spinner {
             width: 14px;
             height: 14px;
@@ -116,7 +170,7 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* Cuadrícula adaptable (2 en móvil, 3 o más en PC) */
+        /* Cuadrícula dinámica: 2 botones en celular, 3 o más en PC */
         #button-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -218,11 +272,15 @@
             <div class="header-title">
                 <h1>Panel Ejecutivo</h1>
             </div>
-            <div class="header-status-wrapper">
-                <div class="spinner" id="loading-spinner"></div>
-                <div class="status-badge">
-                    <div class="status-dot"></div>
-                    <span id="status-text">Sincronizado</span>
+            <div class="header-right">
+                <button id="install-btn">📲 Instalar App</button>
+                
+                <div class="header-status-wrapper">
+                    <div class="spinner" id="loading-spinner"></div>
+                    <div class="status-badge">
+                        <div class="status-dot"></div>
+                        <span id="status-text">Sincronizado</span>
+                    </div>
                 </div>
             </div>
         </header>
@@ -236,14 +294,14 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxsQ-O8kkvh7harM4PlhWcP2eq462Mzc3zni4-WgtSmX5LOjrm8X_q7TnlWGzGjsiCtg/exec';
 
         const colorPalette = [
-            { color: '#2563eb', shadow: 'rgba(37, 99, 235, 0.3)' }, // Azul
-            { color: '#059669', shadow: 'rgba(5, 150, 105, 0.3)' }, // Esmeralda
-            { color: '#7c3aed', shadow: 'rgba(124, 58, 237, 0.3)' }, // Púrpura
-            { color: '#d97706', shadow: 'rgba(217, 119, 6, 0.3)' },  // Ámbar
-            { color: '#0891b2', shadow: 'rgba(8, 145, 178, 0.3)' },  // Cian
-            { color: '#db2777', shadow: 'rgba(219, 39, 119, 0.3)' }, // Fucsia
-            { color: '#4f46e5', shadow: 'rgba(79, 70, 229, 0.3)' },  // Índigo
-            { color: '#ea580c', shadow: 'rgba(234, 88, 12, 0.3)' }   // Naranja
+            { color: '#2563eb', shadow: 'rgba(37, 99, 235, 0.3)' },
+            { color: '#059669', shadow: 'rgba(5, 150, 105, 0.3)' },
+            { color: '#7c3aed', shadow: 'rgba(124, 58, 237, 0.3)' },
+            { color: '#d97706', shadow: 'rgba(217, 119, 6, 0.3)' },
+            { color: '#0891b2', shadow: 'rgba(8, 145, 178, 0.3)' },
+            { color: '#db2777', shadow: 'rgba(219, 39, 119, 0.3)' },
+            { color: '#4f46e5', shadow: 'rgba(79, 70, 229, 0.3)' },
+            { color: '#ea580c', shadow: 'rgba(234, 88, 12, 0.3)' }
         ];
 
         let lastDataString = "";
@@ -272,7 +330,7 @@
                 if (container.children.length === 0 || container.querySelector('.state-message')) {
                     container.innerHTML = `
                         <div class="state-message" style="color: #f87171;">
-                            <b>Error de conexión o bloqueo CORS.</b><br>Verifica tu conexión a internet o la URL del script.
+                            <b>Error de conexión o bloqueo CORS.</b><br>Verifica tu conexión a internet o la publicación en GitHub Pages.
                         </div>
                     `;
                 }
@@ -300,7 +358,7 @@
                 }
             }
 
-            // Ordenamiento alfabético automático A-Z basado en la Columna B
+            // Ordenamiento alfabético de la A a la Z por Columna B
             linksList.sort((a, b) => a.title.localeCompare(b.title, 'es', { sensitivity: 'base' }));
 
             if (linksList.length === 0) {
@@ -314,23 +372,7 @@
                 const currentTheme = colorPalette[index % colorPalette.length];
 
                 html += `
-                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="sheet-card" style="--card-color: ${currentTheme.color}; --card-shadow: ${currentTheme.shadow};">
+                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="sheet-card" style="--card-color: ${currentTheme.color}; --card-shadow:${currentTheme.shadow};">
                         <div class="card-top">
                             <div class="card-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                            </div>
-                            <svg class="external-icon" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
-                        </div>
-                        <div class="card-title">${item.title}</div>
-                    </a>
-                `;
-            });
-
-            container.innerHTML = html;
-        }
-
-        fetchSheetData(true);
-        setInterval(() => fetchSheetData(false), 4000);
-    </script>
-</body>
-</html>
+                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.1
